@@ -13,6 +13,8 @@ import java.util.Scanner;
  */
 public class ConsoleUI {
 
+    private static final String BYTE_ORDER_MARK = "﻿";
+
     private final Scanner scanner;
     private final PrintStream out;
 
@@ -71,6 +73,7 @@ public class ConsoleUI {
         if (!scanner.hasNextLine()) {
             throw new InputClosedException();
         }
-        return scanner.nextLine();
+        // Some consoles send an invisible byte order mark (BOM) before the first line.
+        return scanner.nextLine().replace(BYTE_ORDER_MARK, "");
     }
 }
