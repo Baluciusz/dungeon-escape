@@ -1,7 +1,8 @@
 package dungeon.domain;
 
 /**
- * The player character with its two survival attributes: HP and Food.
+ * The player character with its two survival attributes: HP and Food,
+ * and an {@link Inventory} of consumable items.
  * <p>
  * Both values are always kept between 0 and their maximum (100).
  * The fields are private and can only change through the methods below,
@@ -20,6 +21,9 @@ public class Player {
 
     private int hp;
     private int food;
+
+    /** Composition: the inventory is created with the player and lives only as part of it. */
+    private final Inventory inventory = new Inventory();
 
     /**
      * Creates a player with the given starting values.
@@ -48,6 +52,26 @@ public class Player {
 
     public boolean isAlive() {
         return hp > 0;
+    }
+
+    /** Gives read access to the inventory, e.g. for displaying it. */
+    public Inventory getInventory() {
+        return inventory;
+    }
+
+    public void addItem(Item item) {
+        inventory.addItem(item);
+    }
+
+    /**
+     * Removes the named item from the inventory and applies its effect.
+     *
+     * @return a message describing the effect
+     * @throws ItemNotFoundException if the player has no such item
+     */
+    public String useItem(String itemName) throws ItemNotFoundException {
+        Item item = inventory.removeItem(itemName);
+        return item.applyTo(this);
     }
 
     /**
