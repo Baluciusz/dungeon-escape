@@ -1,0 +1,20 @@
+### Build output ###
+out/
+*.class
+
+### IntelliJ IDEA: personal settings (shared project config in .idea/ IS committed) ###
+.idea/workspace.xml
+.idea/shelf/
+.idea/usage.statistics.xml
+.idea/dictionaries/
+.idea/httpRequests/
+.idea/markdown.xml
+.kotlin
+
+### Game save file (local player data) ###
+dungeon-save.txt
+
+### OS / other editors ###
+.DS_Store
+Thumbs.db
+.vscode/
