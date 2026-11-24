@@ -8,6 +8,8 @@ package dungeon.domain;
  */
 public class ItemNotFoundException extends Exception {
 
+    private static final long serialVersionUID = 1L;
+
     private final String itemName;
 
     public ItemNotFoundException(String itemName) {
