@@ -63,6 +63,23 @@ public class ConsoleUI {
         }
     }
 
+    /**
+     * Reads a player name for the high score list.
+     * The name is trimmed, upper-cased (arcade style), stripped of the ';' separator
+     * used in the high score file and cut to maxLength characters.
+     * Keeps asking until the name is not empty.
+     */
+    public String readName(int maxLength) {
+        while (true) {
+            out.print("Name: ");
+            String name = readLine().replace(";", "").trim().toUpperCase();
+            if (!name.isEmpty()) {
+                return name.length() > maxLength ? name.substring(0, maxLength) : name;
+            }
+            out.println("Please enter a name (1-" + maxLength + " characters).");
+        }
+    }
+
     /** Waits until the player presses ENTER. */
     public void waitForEnter() {
         out.print("Press ENTER to continue...");

@@ -2,13 +2,17 @@ package dungeon.controller;
 
 import dungeon.domain.Difficulty;
 import dungeon.domain.GameState;
+import dungeon.domain.HighScoreEntry;
 import dungeon.domain.Inventory;
 import dungeon.domain.Item;
 import dungeon.domain.ItemNotFoundException;
+import dungeon.domain.Leaderboard;
 import dungeon.domain.Player;
 import dungeon.event.EventOutcome;
 import dungeon.event.GameEvent;
 import dungeon.factory.EventSelector;
+import dungeon.persistence.HighScoreFileException;
+import dungeon.persistence.HighScoreRepository;
 import dungeon.ui.AsciiArt;
 import dungeon.ui.ConsoleUI;
 
@@ -17,7 +21,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Runs the game: main menu, floors, events, inventory and the end screens.
+ * Runs the game: main menu, floors, events, inventory, end screens and high scores.
  * <p>
  * The controller connects the parts but contains no event rules itself:
  * events come from the {@link EventSelector} (Factory Method) and are used
@@ -25,30 +29,40 @@ import java.util.Random;
  */
 public class GameController {
 
+    public static final int MAX_NAME_LENGTH = 12;
+
     private final ConsoleUI ui;
     private final EventSelector eventSelector;
+    private final HighScoreRepository highScores;
     private final Random random;
 
-    public GameController(ConsoleUI ui, EventSelector eventSelector, Random random) {
-        if (ui == null || eventSelector == null || random == null) {
+    public GameController(ConsoleUI ui, EventSelector eventSelector,
+                          HighScoreRepository highScores, Random random) {
+        if (ui == null || eventSelector == null || highScores == null || random == null) {
             throw new IllegalArgumentException("Controller dependencies must not be null");
         }
         this.ui = ui;
         this.eventSelector = eventSelector;
+        this.highScores = highScores;
         this.random = random;
     }
 
     /** Shows the main menu until the player chooses Exit. */
     public void run() {
+        loadLeaderboard(); // checks the high score file at start-up and reports problems early
         boolean running = true;
         while (running) {
             ui.printBlankLine();
             ui.print(AsciiArt.mainMenuBanner());
             ui.printBlankLine();
-            ui.printOptions(List.of("New Game", "Exit"));
-            int choice = ui.readChoice(1, 2);
+            ui.printOptions(List.of("NEW GAME", "HIGH SCORES", "EXIT"));
+            int choice = ui.readChoice(1, 3);
             if (choice == 1) {
-                playGame(startNewGame());
+                GameState state = startNewGame();
+                playGame(state);
+                recordResult(state);
+            } else if (choice == 2) {
+                showHighScores();
             } else {
                 running = false;
             }
@@ -56,7 +70,59 @@ public class GameController {
         ui.print("Thanks for playing. Goodbye!");
     }
 
+    private void showHighScores() {
+        ui.printBlankLine();
+        ui.print(AsciiArt.highScoreTable(loadLeaderboard()));
+        ui.waitForEnter();
+    }
+
+    /**
+     * Adds the finished run to the leaderboard, saves it and shows the ranking.
+     */
+    private void recordResult(GameState state) {
+        Leaderboard leaderboard = loadLeaderboard();
+        int rank = leaderboard.addEntry(new HighScoreEntry(state.getPlayerName(), state.getScore()));
+        try {
+            highScores.save(leaderboard);
+        } catch (HighScoreFileException e) {
+            ui.print("WARNING: " + e.getMessage() + " - this result was not saved.");
+        }
+
+        ui.printBlankLine();
+        ui.print(AsciiArt.header("FINAL SCORE: " + AsciiArt.formatScore(state.getScore())));
+        if (rank > 0) {
+            ui.print("Congratulations " + state.getPlayerName() + ", you placed #" + rank + " on the leaderboard!");
+        } else {
+            ui.print("Not enough for the top " + Leaderboard.MAX_ENTRIES + " this time. Try again!");
+        }
+        ui.printBlankLine();
+        ui.print(AsciiArt.highScoreTable(leaderboard));
+        ui.waitForEnter();
+    }
+
+    /**
+     * Loads the leaderboard. Problems with the file never stop the game:
+     * an unreadable file gives an empty leaderboard and a warning.
+     */
+    private Leaderboard loadLeaderboard() {
+        try {
+            Leaderboard leaderboard = highScores.load();
+            if (highScores.getSkippedLines() > 0) {
+                ui.print("WARNING: ignored " + highScores.getSkippedLines()
+                        + " invalid line(s) in " + highScores.getFile() + ".");
+            }
+            return leaderboard;
+        } catch (HighScoreFileException e) {
+            ui.print("WARNING: " + e.getMessage() + " - starting with an empty leaderboard.");
+            return new Leaderboard();
+        }
+    }
+
     private GameState startNewGame() {
+        ui.printBlankLine();
+        ui.print(AsciiArt.header("ENTER YOUR NAME"));
+        String playerName = ui.readName(MAX_NAME_LENGTH);
+
         ui.printBlankLine();
         ui.print(AsciiArt.header("CHOOSE DIFFICULTY"));
         ui.printBlankLine();
@@ -65,9 +131,9 @@ public class GameController {
                 "NORMAL - 100 HP, 100 Food, no Bread",
                 "CHAOS  - random HP, Food and Bread"));
         Difficulty difficulty = Difficulty.values()[ui.readChoice(1, 3) - 1];
-        GameState state = GameState.newGame(difficulty, random);
+        GameState state = GameState.newGame(playerName, difficulty, random);
         ui.printBlankLine();
-        ui.print("You wake up on the lowest floor of the dungeon. Find your way out!");
+        ui.print("Good luck, " + playerName + ". You wake up on the lowest floor of the dungeon. Find your way out!");
         return state;
     }
 
@@ -82,9 +148,10 @@ public class GameController {
                 ui.waitForEnter();
                 return;
             }
-            state.completeCurrentFloor();
+            int points = state.completeCurrentFloor();
             ui.printBlankLine();
             ui.print(AsciiArt.floorCleared(floor));
+            ui.print("+" + points + " POINTS   SCORE: " + AsciiArt.formatScore(state.getScore()));
             ui.waitForEnter();
         }
         ui.printBlankLine();
@@ -108,7 +175,7 @@ public class GameController {
         ui.print(AsciiArt.floorIntro(floor));
         for (int eventNumber = 1; eventNumber <= eventCount; eventNumber++) {
             showBetweenEventsMenu(state, eventNumber, eventCount);
-            runEvent(eventSelector.nextEvent(floor), player);
+            runEvent(eventSelector.nextEvent(floor), state);
             if (player.isAlive()) {
                 applyHunger(player);
             }
@@ -139,8 +206,9 @@ public class GameController {
         }
     }
 
-    /** Shows an event, lets the player choose, and runs any follow-up event. */
-    private void runEvent(GameEvent event, Player player) {
+    /** Shows an event, lets the player choose, awards points and runs any follow-up event. */
+    private void runEvent(GameEvent event, GameState state) {
+        Player player = state.getPlayer();
         ui.printBlankLine();
         ui.print(event.getArt());
         ui.print(event.getTitle());
@@ -151,8 +219,11 @@ public class GameController {
         EventOutcome outcome = event.resolve(choice, player);
         ui.printBlankLine();
         ui.print(">> " + outcome.getMessage());
+        if (outcome.isEnemyDefeated()) {
+            ui.print(">> +" + state.recordEnemyDefeated() + " POINTS");
+        }
         if (outcome.hasFollowUp() && player.isAlive()) {
-            runEvent(outcome.getFollowUpEvent(), player);
+            runEvent(outcome.getFollowUpEvent(), state);
         }
     }
 

@@ -1,6 +1,8 @@
 package dungeon.ui;
 
 import dungeon.domain.GameState;
+import dungeon.domain.HighScoreEntry;
+import dungeon.domain.Leaderboard;
 import dungeon.domain.Player;
 
 /**
@@ -68,7 +70,32 @@ public final class AsciiArt {
         return "HP " + bar(player.getHp(), Player.MAX_HP) + " " + player.getHp() + "/" + Player.MAX_HP
                 + " | FOOD " + bar(player.getFood(), Player.MAX_FOOD) + " " + player.getFood() + "/" + Player.MAX_FOOD
                 + " | FLOOR " + state.getCurrentFloor() + "/" + GameState.FLOOR_COUNT
-                + " | " + state.getDifficulty();
+                + " | " + state.getDifficulty()
+                + " | SCORE " + formatScore(state.getScore());
+    }
+
+    /** The leaderboard as a retro ASCII table. */
+    public static String highScoreTable(Leaderboard leaderboard) {
+        String border = "+------+--------------+--------+";
+        StringBuilder table = new StringBuilder(header("HIGH SCORES")).append("\n");
+        table.append(border).append("\n");
+        table.append("| RANK | NAME         |  SCORE |\n");
+        table.append(border).append("\n");
+        if (leaderboard.isEmpty()) {
+            table.append("|        NO SCORES YET!        |\n");
+        }
+        int rank = 1;
+        for (HighScoreEntry entry : leaderboard.getEntries()) {
+            table.append(String.format("| %3d. | %-12s | %6s |\n", rank++, entry.getPlayerName(),
+                    formatScore(entry.getScore())));
+        }
+        table.append(border);
+        return table.toString();
+    }
+
+    /** Arcade-style score with leading zeros, e.g. 001200. */
+    public static String formatScore(int score) {
+        return String.format("%06d", score);
     }
 
     /** E.g. "WEAPON: Rusty Sword (+10%)" or "WEAPON: none (bare hands)". */
