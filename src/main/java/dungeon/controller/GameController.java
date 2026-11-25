@@ -25,6 +25,8 @@ import java.util.Random;
  */
 public class GameController {
 
+    public static final int MAX_NAME_LENGTH = 12;
+
     private final ConsoleUI ui;
     private final EventSelector eventSelector;
     private final Random random;
@@ -58,6 +60,10 @@ public class GameController {
 
     private GameState startNewGame() {
         ui.printBlankLine();
+        ui.print(AsciiArt.header("ENTER YOUR NAME"));
+        String playerName = ui.readName(MAX_NAME_LENGTH);
+
+        ui.printBlankLine();
         ui.print(AsciiArt.header("CHOOSE DIFFICULTY"));
         ui.printBlankLine();
         ui.printOptions(List.of(
@@ -65,9 +71,9 @@ public class GameController {
                 "NORMAL - 100 HP, 100 Food, no Bread",
                 "CHAOS  - random HP, Food and Bread"));
         Difficulty difficulty = Difficulty.values()[ui.readChoice(1, 3) - 1];
-        GameState state = GameState.newGame(difficulty, random);
+        GameState state = GameState.newGame(playerName, difficulty, random);
         ui.printBlankLine();
-        ui.print("You wake up on the lowest floor of the dungeon. Find your way out!");
+        ui.print("Good luck, " + playerName + ". You wake up on the lowest floor of the dungeon. Find your way out!");
         return state;
     }
 
@@ -82,9 +88,10 @@ public class GameController {
                 ui.waitForEnter();
                 return;
             }
-            state.completeCurrentFloor();
+            int points = state.completeCurrentFloor();
             ui.printBlankLine();
             ui.print(AsciiArt.floorCleared(floor));
+            ui.print("+" + points + " POINTS   SCORE: " + AsciiArt.formatScore(state.getScore()));
             ui.waitForEnter();
         }
         ui.printBlankLine();
@@ -108,7 +115,7 @@ public class GameController {
         ui.print(AsciiArt.floorIntro(floor));
         for (int eventNumber = 1; eventNumber <= eventCount; eventNumber++) {
             showBetweenEventsMenu(state, eventNumber, eventCount);
-            runEvent(eventSelector.nextEvent(floor), player);
+            runEvent(eventSelector.nextEvent(floor), state);
             if (player.isAlive()) {
                 applyHunger(player);
             }
@@ -139,8 +146,9 @@ public class GameController {
         }
     }
 
-    /** Shows an event, lets the player choose, and runs any follow-up event. */
-    private void runEvent(GameEvent event, Player player) {
+    /** Shows an event, lets the player choose, awards points and runs any follow-up event. */
+    private void runEvent(GameEvent event, GameState state) {
+        Player player = state.getPlayer();
         ui.printBlankLine();
         ui.print(event.getArt());
         ui.print(event.getTitle());
@@ -151,8 +159,11 @@ public class GameController {
         EventOutcome outcome = event.resolve(choice, player);
         ui.printBlankLine();
         ui.print(">> " + outcome.getMessage());
+        if (outcome.isEnemyDefeated()) {
+            ui.print(">> +" + state.recordEnemyDefeated() + " POINTS");
+        }
         if (outcome.hasFollowUp() && player.isAlive()) {
-            runEvent(outcome.getFollowUpEvent(), player);
+            runEvent(outcome.getFollowUpEvent(), state);
         }
     }
 

@@ -69,7 +69,7 @@ public class EnemyEncounterEvent extends GameEvent {
                 player.addItem(new HealthPotion());
                 message += " It dropped a Health Potion!";
             }
-            return EventOutcome.of(message);
+            return EventOutcome.enemyDefeated(message);
         }
         int lost = player.takeDamage(enemy.getDamage());
         return EventOutcome.of("The " + enemy.getName() + " overpowers you. HP -" + lost

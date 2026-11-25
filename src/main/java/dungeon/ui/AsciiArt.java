@@ -68,7 +68,13 @@ public final class AsciiArt {
         return "HP " + bar(player.getHp(), Player.MAX_HP) + " " + player.getHp() + "/" + Player.MAX_HP
                 + " | FOOD " + bar(player.getFood(), Player.MAX_FOOD) + " " + player.getFood() + "/" + Player.MAX_FOOD
                 + " | FLOOR " + state.getCurrentFloor() + "/" + GameState.FLOOR_COUNT
-                + " | " + state.getDifficulty();
+                + " | " + state.getDifficulty()
+                + " | SCORE " + formatScore(state.getScore());
+    }
+
+    /** Arcade-style score with leading zeros, e.g. 001200. */
+    public static String formatScore(int score) {
+        return String.format("%06d", score);
     }
 
     /** E.g. "WEAPON: Rusty Sword (+10%)" or "WEAPON: none (bare hands)". */
