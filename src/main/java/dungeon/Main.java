@@ -9,9 +9,11 @@ import dungeon.factory.GameEventCreator;
 import dungeon.factory.RestingPlaceEventCreator;
 import dungeon.factory.TrapEventCreator;
 import dungeon.factory.TreasureChestEventCreator;
+import dungeon.persistence.HighScoreRepository;
 import dungeon.ui.ConsoleUI;
 import dungeon.ui.InputClosedException;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Random;
 
@@ -22,6 +24,9 @@ import java.util.Random;
  * It wires the objects together and starts the game.
  */
 public final class Main {
+
+    /** The high score file, created in the folder the game is started from. */
+    private static final String HIGH_SCORE_FILE = "highscores.txt";
 
     private Main() {
         // Utility class: no instances.
@@ -40,7 +45,8 @@ public final class Main {
 
         EventSelector eventSelector = new EventSelector(creators, random);
         ConsoleUI ui = new ConsoleUI(System.in, System.out);
-        GameController controller = new GameController(ui, eventSelector, random);
+        HighScoreRepository highScores = new HighScoreRepository(Path.of(HIGH_SCORE_FILE));
+        GameController controller = new GameController(ui, eventSelector, highScores, random);
 
         try {
             controller.run();
