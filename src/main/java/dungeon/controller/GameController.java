@@ -124,6 +124,7 @@ public class GameController {
         while (true) {
             ui.printBlankLine();
             ui.print(AsciiArt.statusBar(state));
+            ui.print(AsciiArt.weaponLine(state.getPlayer()));
             ui.print("Floor " + state.getCurrentFloor() + " - encounter " + eventNumber + " of " + eventCount);
             ui.printOptions(List.of("Continue", "Inventory", "Map"));
             int choice = ui.readChoice(1, 3);
@@ -165,12 +166,17 @@ public class GameController {
         }
     }
 
-    /** Lists the items alphabetically and lets the player use one. */
+    /**
+     * Lists the items alphabetically. Choosing an item uses it
+     * (food and potions are consumed, swords are equipped).
+     * An equipped sword can also be put back into the bag.
+     */
     private void openInventory(Player player) {
         Inventory inventory = player.getInventory();
         ui.printBlankLine();
         ui.print(AsciiArt.header("INVENTORY"));
-        if (inventory.isEmpty()) {
+        ui.print(AsciiArt.weaponLine(player));
+        if (inventory.isEmpty() && !player.hasWeaponEquipped()) {
             ui.print("Your bag is empty.");
             return;
         }
@@ -180,17 +186,24 @@ public class GameController {
         for (String name : names) {
             options.add(name + " x" + inventory.countOf(name) + "  (" + descriptionOf(inventory, name) + ")");
         }
+        int unequipChoice = -1;
+        if (player.hasWeaponEquipped()) {
+            options.add("Unequip " + player.getEquippedWeapon().getName());
+            unequipChoice = options.size();
+        }
         options.add("Back");
+        ui.printBlankLine();
         ui.printOptions(options);
 
         int choice = ui.readChoice(1, options.size());
-        if (choice == options.size()) {
-            return;
-        }
-        try {
-            ui.print(">> " + player.useItem(names.get(choice - 1)));
-        } catch (ItemNotFoundException e) {
-            ui.print(">> " + e.getMessage());
+        if (choice <= names.size()) {
+            try {
+                ui.print(">> " + player.useItem(names.get(choice - 1)));
+            } catch (ItemNotFoundException e) {
+                ui.print(">> " + e.getMessage());
+            }
+        } else if (choice == unequipChoice) {
+            ui.print(">> " + player.unequipWeapon());
         }
     }
 
