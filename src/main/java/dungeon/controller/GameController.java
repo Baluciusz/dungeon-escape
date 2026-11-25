@@ -147,8 +147,8 @@ public class GameController {
         ui.print(event.getArt());
         ui.print(event.getTitle());
         ui.printBlankLine();
-        ui.printOptions(event.getOptions());
-        int choice = ui.readChoice(1, event.getOptions().size());
+        ui.printOptions(event.getOptions(player));
+        int choice = ui.readChoice(1, event.getOptions(player).size());
 
         EventOutcome outcome = event.resolve(choice, player);
         ui.printBlankLine();

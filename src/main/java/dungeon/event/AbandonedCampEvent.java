@@ -45,7 +45,7 @@ public class AbandonedCampEvent extends GameEvent {
     }
 
     @Override
-    public List<String> getOptions() {
+    public List<String> getOptions(Player player) {
         return List.of("Search the camp", "Leave it alone");
     }
 

@@ -32,8 +32,12 @@ public abstract class GameEvent {
     /** Small ASCII illustration of the event. */
     public abstract String getArt();
 
-    /** The choices the player can make, in display order (choice 1 is the first element). */
-    public abstract List<String> getOptions();
+    /**
+     * The choices the player can make, in display order (choice 1 is the first element).
+     * The player is passed in so an option can show player-specific values,
+     * e.g. a fight chance improved by the equipped weapon.
+     */
+    public abstract List<String> getOptions(Player player);
 
     /**
      * Resolves the player's choice. The choice is validated here once,
@@ -43,12 +47,12 @@ public abstract class GameEvent {
      * @throws IllegalArgumentException if the choice is not one of the options
      */
     public final EventOutcome resolve(int choice, Player player) {
-        int optionCount = getOptions().size();
-        if (choice < 1 || choice > optionCount) {
-            throw new IllegalArgumentException("Choice must be between 1 and " + optionCount + ": " + choice);
-        }
         if (player == null) {
             throw new IllegalArgumentException("Player must not be null");
+        }
+        int optionCount = getOptions(player).size();
+        if (choice < 1 || choice > optionCount) {
+            throw new IllegalArgumentException("Choice must be between 1 and " + optionCount + ": " + choice);
         }
         return handleChoice(choice, player);
     }

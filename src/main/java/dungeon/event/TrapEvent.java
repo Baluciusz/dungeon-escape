@@ -37,7 +37,7 @@ public class TrapEvent extends GameEvent {
     }
 
     @Override
-    public List<String> getOptions() {
+    public List<String> getOptions(Player player) {
         return List.of(
                 "Try to disarm it (" + DISARM_SUCCESS_CHANCE + "% success, -" + DISARM_FAIL_DAMAGE + " HP on failure)",
                 "Risk running through (" + RUN_SUCCESS_CHANCE + "% success, -" + RUN_FAIL_DAMAGE + " HP on failure)");

@@ -36,7 +36,7 @@ public class ExplorationEvent extends GameEvent {
     }
 
     @Override
-    public List<String> getOptions() {
+    public List<String> getOptions(Player player) {
         return List.of(
                 "Take the careful path (-" + CAREFUL_PATH_FOOD_COST + " extra Food)",
                 "Take the shortcut (" + SHORTCUT_FALL_CHANCE + "% risk of falling)");

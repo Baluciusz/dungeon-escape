@@ -47,9 +47,13 @@ public class EnemyEncounterEvent extends GameEvent {
     }
 
     @Override
-    public List<String> getOptions() {
+    public List<String> getOptions(Player player) {
+        String fight = "Fight (" + enemy.getWinChanceWith(player.getWeaponBonus()) + "% chance to win";
+        if (player.hasWeaponEquipped()) {
+            fight += ", +" + player.getWeaponBonus() + "% " + player.getEquippedWeapon().getName();
+        }
         return List.of(
-                "Fight (" + enemy.getWinChance() + "% chance to win)",
+                fight + ")",
                 "Attempt to escape (" + enemy.getEscapeChance() + "% chance)");
     }
 
@@ -59,7 +63,7 @@ public class EnemyEncounterEvent extends GameEvent {
     }
 
     private EventOutcome fight(Player player) {
-        if (chance(enemy.getWinChance())) {
+        if (chance(enemy.getWinChanceWith(player.getWeaponBonus()))) {
             String message = "You defeated the " + enemy.getName() + "!";
             if (chance(POTION_DROP_CHANCE)) {
                 player.addItem(new HealthPotion());

@@ -11,6 +11,9 @@ public class Enemy {
     public static final int WIN_CHANCE_DROP_PER_FLOOR = 5;
     public static final int DAMAGE_INCREASE_PER_FLOOR = 3;
 
+    /** A fight can never be a sure win, even with the best weapon. */
+    public static final int MAX_WIN_CHANCE = 95;
+
     private final EnemyType type;
     private final int floor;
 
@@ -45,6 +48,15 @@ public class Enemy {
     /** HP lost by the player when losing a fight against this enemy. */
     public int getDamage() {
         return type.getBaseDamage() + DAMAGE_INCREASE_PER_FLOOR * (floor - 1);
+    }
+
+    /**
+     * Win chance including a weapon bonus, capped at {@link #MAX_WIN_CHANCE}.
+     *
+     * @param weaponBonus extra percentage points from the equipped weapon (0 if none)
+     */
+    public int getWinChanceWith(int weaponBonus) {
+        return Math.min(MAX_WIN_CHANCE, getWinChance() + weaponBonus);
     }
 
     /** Chance (in percent) that the player escapes from this enemy. */
