@@ -1,0 +1,3 @@
+# Keep shell scripts with Unix line endings and Windows scripts with CRLF
+mvnw text eol=lf
+*.cmd text eol=crlf
