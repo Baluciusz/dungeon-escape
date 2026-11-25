@@ -1,20 +1,18 @@
-### Build output ###
+### Maven build output ###
+target/
+
+### IDE files (the project is built with Maven, not with IDE settings) ###
+.idea/
+*.iml
 out/
-*.class
+.vscode/
+.classpath
+.project
+.settings/
 
-### IntelliJ IDEA: personal settings (shared project config in .idea/ IS committed) ###
-.idea/workspace.xml
-.idea/shelf/
-.idea/usage.statistics.xml
-.idea/dictionaries/
-.idea/httpRequests/
-.idea/markdown.xml
-.kotlin
+### Local game data ###
+highscores.txt
 
-### Game save file (local player data) ###
-dungeon-save.txt
-
-### OS / other editors ###
+### OS files ###
 .DS_Store
 Thumbs.db
-.vscode/
