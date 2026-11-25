@@ -3,6 +3,11 @@
 The diagrams are written in [Mermaid](https://mermaid.js.org/). GitHub renders them
 directly, and the same text is the editable source.
 
+Image versions (open in any web browser, no Mermaid support needed):
+[class-diagram.svg](class-diagram.svg) (overview) and
+[factory-method.svg](factory-method.svg) (Factory Method).
+They were exported from the Mermaid source below; after changing the source, export them again.
+
 Notation: `+` public, `-` private, `#` protected, `*` abstract method, `$` static.
 Relationship arrows:
 
