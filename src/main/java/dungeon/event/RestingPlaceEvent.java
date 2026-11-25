@@ -10,7 +10,7 @@ import java.util.Random;
  */
 public class RestingPlaceEvent extends GameEvent {
 
-    public static final int REST_HEAL = 20;
+    public static final int REST_HEAL = 10;
 
     public RestingPlaceEvent(Random random) {
         super(random);
@@ -34,7 +34,7 @@ public class RestingPlaceEvent extends GameEvent {
     }
 
     @Override
-    public List<String> getOptions() {
+    public List<String> getOptions(Player player) {
         return List.of("Rest (+" + REST_HEAL + " HP)", "Move on");
     }
 

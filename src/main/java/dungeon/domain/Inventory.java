@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Holds the player's consumable items.
+ * Holds the player's items (consumables and unequipped weapons).
  * <p>
  * The inventory aggregates {@link Item} objects in a generic {@code List<Item>}.
  * The list itself is never exposed, so items can only be changed through these methods.

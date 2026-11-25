@@ -71,6 +71,15 @@ public final class AsciiArt {
                 + " | " + state.getDifficulty();
     }
 
+    /** E.g. "WEAPON: Rusty Sword (+10%)" or "WEAPON: none (bare hands)". */
+    public static String weaponLine(Player player) {
+        if (!player.hasWeaponEquipped()) {
+            return "WEAPON: none (bare hands)";
+        }
+        return "WEAPON: " + player.getEquippedWeapon().getName()
+                + " (+" + player.getWeaponBonus() + "% to win fights)";
+    }
+
     private static String bar(int value, int max) {
         int filled = (int) Math.round((double) value / max * BAR_WIDTH);
         return "[" + "#".repeat(filled) + "-".repeat(BAR_WIDTH - filled) + "]";

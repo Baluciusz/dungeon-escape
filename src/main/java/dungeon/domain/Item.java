@@ -1,7 +1,7 @@
 package dungeon.domain;
 
 /**
- * Abstract base class of every consumable item.
+ * Abstract base class of every item (consumables and weapons).
  * <p>
  * Each concrete item decides in {@link #applyTo(Player)} what happens when it is used.
  * Code that uses items (for example {@link Player#useItem(String)}) only knows this
