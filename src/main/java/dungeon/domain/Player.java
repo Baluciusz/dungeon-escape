@@ -2,7 +2,7 @@ package dungeon.domain;
 
 /**
  * The player character with its two survival attributes: HP and Food,
- * and an {@link Inventory} of consumable items.
+ * an {@link Inventory} of items and at most one equipped {@link Weapon}.
  * <p>
  * Both values are always kept between 0 and their maximum (100).
  * The fields are private and can only change through the methods below,
@@ -24,6 +24,9 @@ public class Player {
 
     /** Composition: the inventory is created with the player and lives only as part of it. */
     private final Inventory inventory = new Inventory();
+
+    /** The currently equipped weapon (0..1), or null if the player fights bare-handed. */
+    private Weapon equippedWeapon;
 
     /**
      * Creates a player with the given starting values.
@@ -72,6 +75,59 @@ public class Player {
     public String useItem(String itemName) throws ItemNotFoundException {
         Item item = inventory.removeItem(itemName);
         return item.applyTo(this);
+    }
+
+    /**
+     * Equips the given weapon. A previously equipped weapon goes back to the inventory.
+     *
+     * @return a message describing the change
+     */
+    public String equipWeapon(Weapon weapon) {
+        if (weapon == null) {
+            throw new IllegalArgumentException("Weapon must not be null");
+        }
+        String message = "You equip the " + weapon.getName() + ".";
+        if (equippedWeapon != null) {
+            inventory.addItem(equippedWeapon);
+            message += " The " + equippedWeapon.getName() + " goes back into your bag.";
+        }
+        equippedWeapon = weapon;
+        return message;
+    }
+
+    /**
+     * Puts the equipped weapon back into the inventory.
+     *
+     * @return a message describing the change
+     */
+    public String unequipWeapon() {
+        if (equippedWeapon == null) {
+            return "You have no weapon equipped.";
+        }
+        Weapon removed = equippedWeapon;
+        equippedWeapon = null;
+        inventory.addItem(removed);
+        return "You put the " + removed.getName() + " back into your bag.";
+    }
+
+    public boolean hasWeaponEquipped() {
+        return equippedWeapon != null;
+    }
+
+    /** Returns the equipped weapon, or null if there is none. */
+    public Weapon getEquippedWeapon() {
+        return equippedWeapon;
+    }
+
+    /** The fight bonus of the equipped weapon, or 0 without a weapon. */
+    public int getWeaponBonus() {
+        return equippedWeapon == null ? 0 : equippedWeapon.getWinChanceBonus();
+    }
+
+    /** True if the player has a weapon with this name, either equipped or in the bag. */
+    public boolean ownsWeapon(String weaponName) {
+        boolean equipped = equippedWeapon != null && equippedWeapon.getName().equals(weaponName);
+        return equipped || inventory.countOf(weaponName) > 0;
     }
 
     /**
