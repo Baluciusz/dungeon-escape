@@ -9,7 +9,7 @@ package dungeon.domain;
 public class Enemy {
 
     public static final int WIN_CHANCE_DROP_PER_FLOOR = 5;
-    public static final int DAMAGE_INCREASE_PER_FLOOR = 3;
+    public static final int DAMAGE_INCREASE_PER_FLOOR = 6;
 
     /** A fight can never be a sure win, even with the best weapon. */
     public static final int MAX_WIN_CHANCE = 95;

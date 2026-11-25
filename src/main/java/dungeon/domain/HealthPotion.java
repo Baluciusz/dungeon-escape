@@ -6,7 +6,7 @@ package dungeon.domain;
 public class HealthPotion extends Item {
 
     public static final String NAME = "Health Potion";
-    public static final int HP_RESTORED = 30;
+    public static final int HP_RESTORED = 20;
 
     public HealthPotion() {
         super(NAME);
