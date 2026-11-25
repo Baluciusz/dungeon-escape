@@ -25,9 +25,6 @@ import java.util.Random;
  */
 public class GameController {
 
-    public static final int MIN_EVENTS_PER_FLOOR = 3;
-    public static final int MAX_EVENTS_PER_FLOOR = 4;
-
     private final ConsoleUI ui;
     private final EventSelector eventSelector;
     private final Random random;
@@ -98,14 +95,14 @@ public class GameController {
     }
 
     /**
-     * Plays 3-4 random events on the current floor.
+     * Plays the random events of the current floor (the count depends on the difficulty).
      *
      * @return true if the player survived the floor
      */
     private boolean playFloor(GameState state) {
         int floor = state.getCurrentFloor();
         Player player = state.getPlayer();
-        int eventCount = random.nextInt(MIN_EVENTS_PER_FLOOR, MAX_EVENTS_PER_FLOOR + 1);
+        int eventCount = state.getDifficulty().rollEventsPerFloor(random);
 
         ui.printBlankLine();
         ui.print(AsciiArt.floorIntro(floor));

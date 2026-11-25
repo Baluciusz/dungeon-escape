@@ -14,7 +14,7 @@ public class Player {
     public static final int MAX_FOOD = 100;
 
     /** Food lost after every completed event. */
-    public static final int FOOD_PER_EVENT = 10;
+    public static final int FOOD_PER_EVENT = 5;
 
     /** HP lost after an event when the player has no food left. */
     public static final int STARVATION_DAMAGE = 5;
