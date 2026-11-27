@@ -11,7 +11,7 @@ import java.util.List;
  * Entries are kept in a generic {@code List<HighScoreEntry>} and sorted with a
  * {@link Comparator}. Equal scores are ordered alphabetically by name.
  */
-public class Leaderboard {
+public final class Leaderboard { {
 
     public static final int MAX_ENTRIES = 10;
 
