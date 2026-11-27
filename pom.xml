@@ -6,7 +6,7 @@
 
     <groupId>io.github.baluciusz</groupId>
     <artifactId>dungeon-escape</artifactId>
-    <version>0.8.0</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
     <name>Dungeon Escape</name>
@@ -35,6 +35,8 @@
     </dependencies>
 
     <build>
+        <!-- Fixed JAR name so the run command never changes: target/dungeon-escape.jar -->
+        <finalName>dungeon-escape</finalName>
         <plugins>
             <!-- Compiles the sources for Java 25 -->
             <plugin>
@@ -56,7 +58,7 @@
                 <version>${maven.surefire.plugin.version}</version>
             </plugin>
 
-            <!-- Builds a runnable JAR: java -jar target/dungeon-escape-<version>.jar -->
+            <!-- Builds a runnable JAR: java -jar target/dungeon-escape.jar -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>

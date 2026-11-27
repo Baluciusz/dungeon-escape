@@ -13,7 +13,8 @@ import java.util.Scanner;
  */
 public class ConsoleUI {
 
-    private static final String BYTE_ORDER_MARK = "﻿";
+    /** Invisible "byte order mark" (U+FEFF) that some consoles send before the first line. */
+    private static final String BYTE_ORDER_MARK = String.valueOf((char) 0xFEFF);
 
     private final Scanner scanner;
     private final PrintStream out;

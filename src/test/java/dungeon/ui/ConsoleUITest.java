@@ -8,6 +8,7 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -40,6 +41,14 @@ class ConsoleUITest {
 
         assertEquals("BALINT THE B", name);
         assertTrue(output.toString(StandardCharsets.UTF_8).contains("Please enter a name"));
+    }
+
+    @Test
+    void invisibleByteOrderMarkBeforeTheFirstInputIsIgnored() {
+        ConsoleUI ui = uiWithInput((char) 0xFEFF + "2\n");
+
+        assertEquals(2, ui.readChoice(1, 3));
+        assertFalse(output.toString(StandardCharsets.UTF_8).contains("Invalid choice"));
     }
 
     @Test
