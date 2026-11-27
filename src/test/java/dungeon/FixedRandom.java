@@ -1,7 +1,6 @@
 package dungeon;
 
 import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.Random;
 
 /**
@@ -15,7 +14,7 @@ public class FixedRandom extends Random {
 
     private static final long serialVersionUID = 1L;
 
-    private final Deque<Integer> values = new ArrayDeque<>();
+         private final ArrayDeque<Integer> values = new ArrayDeque<>();
 
     public FixedRandom(int... values) {
         for (int value : values) {
