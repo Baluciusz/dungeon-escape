@@ -127,6 +127,6 @@ is called.
 - `highscores.txt` is written to the folder the program is started from; it is local to that
   computer and not protected against manual editing.
 - Player names are limited to 12 characters and the `;` character is removed.
-- Game balance was tuned with simulated runs, not with large-scale play testing.
+- Game balance was tuned by playing and adjusting the values, not with large-scale play testing.
 - The console UI itself (`GameController` menus) is tested manually; unit tests cover the
   game rules, Factory Method, leaderboard, file handling and input validation.
